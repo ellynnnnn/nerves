@@ -109,3 +109,91 @@ const CHAINS = [
   { nodes: ['insula', 'hypothalamus'] }, { nodes: ['insula', 'prefrontal'] },
   { nodes: ['hypothalamus', 'brainstem'] },
 ];
+
+/*
+ * Extra nerve strands (inspired by old anatomy drawings of the nervous system):
+ * bundles of thin nerves along the arms and legs that fan out into the hands and feet,
+ * and small pairs of nerves all along the spine.
+ *   count  : number of strands in the bundle
+ *   spread : how far apart the strands are
+ *   fan    : number of little branches at the end (fingers / toes)
+ */
+const BUNDLES = [
+  { nodes: ['brainstem', 'spineC', 'spineT', 'spineL', 'sacrum'], count: 3, spread: 4 },
+  { nodes: ['brainstem', 'throat', 'heart', 'stomach', 'gut'], count: 2, spread: 4 },
+  { nodes: ['spineC', 'shoulderL', 'elbowL', 'handL'], count: 5, spread: 9, fan: 5, fanLen: 30 },
+  { nodes: ['spineC', 'shoulderR', 'elbowR', 'handR'], count: 5, spread: 9, fan: 5, fanLen: 30 },
+  { nodes: ['sacrum', 'hipL', 'kneeL', 'footL'], count: 6, spread: 11, fan: 5, fanLen: 24 },
+  { nodes: ['sacrum', 'hipR', 'kneeR', 'footR'], count: 6, spread: 11, fan: 5, fanLen: 24 },
+];
+
+function buildNerveStrands() {
+  let seed = 11;
+  const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const strands = [];
+
+  // smooth line through the nodes
+  function curve(names, perSegment) {
+    const p = names.map((n) => NODES[n]);
+    const out = [];
+    for (let i = 0; i < p.length - 1; i++) {
+      const p0 = p[i - 1] || p[i], p1 = p[i], p2 = p[i + 1], p3 = p[i + 2] || p2;
+      for (let s = 0; s < perSegment; s++) {
+        const t = s / perSegment, t2 = t * t, t3 = t2 * t;
+        const c = (a, b, c2, d) => 0.5 * (2 * b + (-a + c2) * t + (2 * a - 5 * b + 4 * c2 - d) * t2 + (-a + 3 * b - 3 * c2 + d) * t3);
+        out.push({ x: c(p0.x, p1.x, p2.x, p3.x), y: c(p0.y, p1.y, p2.y, p3.y) });
+      }
+    }
+    out.push({ x: p[p.length - 1].x, y: p[p.length - 1].y });
+    return out;
+  }
+
+  BUNDLES.forEach((b) => {
+    const base = curve(b.nodes, 12);
+    const n = base.length;
+    for (let k = 0; k < b.count; k++) {
+      const o = b.count === 1 ? 0 : (k / (b.count - 1)) * 2 - 1;
+      const wob = rand() * 6;
+      const line = base.map((p, i) => {
+        const q = base[Math.min(n - 1, i + 1)], r = base[Math.max(0, i - 1)];
+        const dx = q.x - r.x, dy = q.y - r.y, len = Math.hypot(dx, dy) || 1;
+        const t = i / (n - 1);
+        const off = o * b.spread * (0.35 + 0.65 * t) + Math.sin(t * 9 + wob) * 1.2;
+        return { x: p.x - (dy / len) * off, y: p.y + (dx / len) * off };
+      });
+      strands.push(line);
+      if (!b.fan || k % 2) continue;
+      // fingers / toes
+      const end = line[n - 1], prev = line[n - 4];
+      const dir = Math.atan2(end.y - prev.y, end.x - prev.x);
+      for (let j = 0; j < b.fan; j++) {
+        const a = dir + (j - (b.fan - 1) / 2) * 0.2 + o * 0.08;
+        const L = b.fanLen * (0.6 + rand() * 0.5);
+        const bend = (rand() - 0.5) * 0.3;
+        strands.push([0, 0.35, 0.7, 1].map((t) => ({
+          x: end.x + Math.cos(a + bend * t) * L * t,
+          y: end.y + Math.sin(a + bend * t) * L * t,
+        })));
+      }
+    }
+  });
+
+  // pairs of nerves along the spine (like the rungs of a ladder)
+  for (let y = 200; y <= 440; y += 12) {
+    for (const side of [-1, 1]) {
+      const L = 14 + rand() * 12, drop = 4 + rand() * 5;
+      strands.push([0, 0.5, 1].map((t) => ({ x: 200 + side * L * t, y: y + drop * t * t })));
+    }
+  }
+
+  // nerves of the face and head, spreading from the brainstem
+  for (let j = 0; j < 9; j++) {
+    const a = -Math.PI / 2 + (j - 4) * 0.33;
+    const L = 38 + rand() * 18;
+    strands.push([0, 0.4, 0.75, 1].map((t) => ({
+      x: 200 + Math.cos(a) * L * t * 1.1,
+      y: 150 + Math.sin(a) * L * t * 1.6 + t * (1 - t) * 10,
+    })));
+  }
+  return strands;
+}

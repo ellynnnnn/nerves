@@ -1,6 +1,7 @@
 # Nerves: how a feeling travels through your body
 
-Type a situation ("I lost my dog", "My crush hugged me"…) and watch:
+It opens on a dreamy home page: a close-up of the body that slowly zooms out while glowing dots travel along the nerves.
+Then, type a situation ("I lost my dog", "My crush hugged me"…) and watch:
 
 - the **aura** around the body change colour and rhythm with each emotion,
 - **little dots** travel along the nerves (one by one, or many at once), with ripples where they arrive,
@@ -21,7 +22,9 @@ It is a simple website with no installation. Download the folder and double-clic
 | Colours, speed, rhythm of each emotion, texts, trigger words | `js/emotions.js` |
 | Position of the body parts, shape of the silhouette | `js/body.js` |
 | Fonts, light / dark colours, page layout | `css/style.css` |
-| Title, intro text, example buttons | `index.html` |
+| Title, home page text, example buttons | `index.html` |
+| Home page animation (dots, zoom, loading time) | `js/intro.js` |
+| Number of nerve strands in the arms, legs, spine | `BUNDLES` in `js/body.js` |
 
 ## Put it online for free (GitHub Pages)
 

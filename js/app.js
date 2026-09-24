@@ -47,7 +47,7 @@
     return d + 'Z';
   }
   const BODY_D = silhouettePath();
-  ['#clipShape', '#bodyBase', '#bodyRim'].forEach((id) => $(id).setAttribute('d', BODY_D));
+  ['#clipShape', '#clipShapeLayer', '#bodyBase', '#bodyRim'].forEach((id) => $(id).setAttribute('d', BODY_D));
 
   /* ---------- Nerve edges (each connection is one curve) ---------- */
   const EDGES = {};
@@ -147,6 +147,10 @@
       .forEach((o) => { const q = brainPts[o.j]; fine += `M${f(p.x)},${f(p.y)} L${f(q.x)},${f(q.y)} `; });
   });
   el('path', { d: fine, fill: 'none', 'stroke-width': 0.5 }, $('#fine'));
+
+  /* ---------- Bundles of nerve strands (see BUNDLES in body.js) ---------- */
+  const strandD = buildNerveStrands().map((line) => 'M' + line.map((p) => `${f(p.x)},${f(p.y)}`).join(' L')).join(' ');
+  el('path', { d: strandD, fill: 'none', 'stroke-width': 0.55, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, $('#strands'));
 
   /* ---------- Glow inside the body (like the reference: light coming from within) ---------- */
   const defs = svg.querySelector('defs');
@@ -736,8 +740,10 @@
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    if (!paused) update(dt);
-    render(paused ? 0 : dt);
+    if (!document.body.classList.contains('intro-open')) {   // wait until the home page is closed
+      if (!paused) update(dt);
+      render(paused ? 0 : dt);
+    }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
