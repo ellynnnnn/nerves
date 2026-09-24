@@ -1,0 +1,248 @@
+/* ---------- Colours & fonts (change these to match the moodboard) ---------- */
+:root {
+  --bg: #05070d;
+  --bg-2: #0b1020;
+  --text: #e8ecf5;
+  --muted: #8a93a8;
+  --line: rgba(200, 215, 255, 0.12);
+  --accent: #c9d6ff;
+  --glow: #8aa4d6;          /* updated live by the animation */
+  --nerve: rgba(190, 210, 255, 0.28);
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 460px) 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- Left panel ---------- */
+.panel {
+  padding: 48px 40px;
+  border-right: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--bg-2), var(--bg));
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
+h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.05;
+  margin: 0 0 16px;
+}
+h1 em { color: var(--accent); }
+
+h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 22px;
+  margin: 32px 0 12px;
+}
+
+.intro { color: var(--muted); line-height: 1.6; font-size: 14px; margin: 0 0 28px; }
+
+.label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+textarea:focus {
+  border-color: rgba(200, 215, 255, 0.4);
+  box-shadow: 0 0 0 4px rgba(200, 215, 255, 0.06);
+}
+
+.actions { margin: 12px 0 28px; }
+
+button { font: inherit; cursor: pointer; }
+
+.btn-primary {
+  background: var(--text);
+  color: var(--bg);
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 26px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: transform .15s, box-shadow .3s;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 24px var(--glow); }
+
+.example-list { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip, .ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  transition: border-color .2s, background .2s;
+}
+.chip:hover, .ghost:hover { border-color: rgba(200, 215, 255, 0.45); background: rgba(255,255,255,0.04); }
+
+.note { color: var(--muted); font-size: 13px; font-style: italic; }
+
+.emotion-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.emotion {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 13px;
+  opacity: 0.55;
+  transition: opacity .4s, border-color .4s;
+}
+.emotion.active { opacity: 1; border-color: rgba(255,255,255,0.4); }
+.emotion .swatch {
+  width: 14px; height: 14px; border-radius: 50%;
+}
+
+.steps { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+.steps li {
+  position: relative;
+  padding: 10px 0 10px 36px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  transition: color .4s;
+}
+.steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute; left: 0; top: 10px;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1px solid var(--line);
+  font-size: 11px;
+  display: grid; place-items: center;
+}
+.steps li.group-title {
+  color: var(--text);
+  padding-left: 0;
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 500;
+}
+.steps li.group-title::before { display: none; counter-increment: none; }
+.steps li.active { color: var(--text); }
+.steps li.active::before { border-color: var(--glow); box-shadow: 0 0 10px var(--glow); }
+
+.disclaimer { margin-top: 40px; font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+/* ---------- Right stage ---------- */
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 16px 20px;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--glow) 18%, transparent), transparent 60%),
+    var(--bg);
+}
+
+#body {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+#nerves path { stroke: var(--nerve); }
+
+.caption {
+  width: min(560px, 100%);
+  min-height: 2.7em;
+  margin: 8px 0 12px;
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--text);
+  text-shadow: 0 0 18px rgba(0,0,0,0.9);
+  opacity: 0;
+  transition: opacity .6s;
+  pointer-events: none;
+}
+.caption.show { opacity: 1; }
+
+.stage-controls {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center;
+}
+.toggle { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; margin-left: 6px; }
+
+.tooltip {
+  position: absolute;
+  max-width: 240px;
+  padding: 10px 12px;
+  background: rgba(8, 11, 20, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  pointer-events: none;
+  z-index: 5;
+}
+.tooltip strong { display: block; font-weight: 500; margin-bottom: 2px; }
+
+.node-label {
+  font-family: var(--sans);
+  font-size: 9px;
+  fill: #fff;
+  paint-order: stroke;
+  stroke: rgba(0,0,0,0.85);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
+/* ---------- Phones & tablets ---------- */
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .panel { max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding: 32px 16px; }
+  .stage { height: 88vh; }
+  h1 { font-size: 32px; }
+  .caption { font-size: 17px; }
+}
