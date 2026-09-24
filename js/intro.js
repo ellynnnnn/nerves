@@ -95,7 +95,7 @@
     g.translate(W / 2, H / 2);
     g.scale(1, 2.4);                        // tall letters, like an ASCII banner
     g.fillText('NERVES', 0, 0);
-    g.lineWidth = size * 0.06;              // thicker letters, easier to read in characters
+    g.lineWidth = size * 0.025;             // thicker letters, easier to read in characters
     g.lineJoin = 'round';
     g.strokeText('NERVES', 0, 0);
   });
