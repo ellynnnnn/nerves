@@ -1,8 +1,11 @@
 /*
  * emotions.js — what each emotion looks like.
  *
- *  colors   : the 3 colours of the aura
- *  dot      : colour of the travelling dots
+ *  colors   : the 5 colours of the aura (they are mixed together)
+ *  dot      : colour of the travelling dots in dark mode
+ *  ink      : colour of the travelling dots in light mode
+ *  sparkle  : how many little lights float around the body
+ *  drift    : -1 the lights rise, 1 they fall (like tears), 0 they float
  *  pulse    : how many aura "breaths" per second (0.2 = slow, 2 = very fast)
  *  wave     : shape of the pulse: sine | heartbeat | flicker | sharp | wobble | spike
  *  speed    : speed of the dots
@@ -22,7 +25,7 @@ const LEGS = [['spineT', 'spineL', 'sacrum', 'hipL', 'kneeL', 'footL'], ['spineT
 
 const EMOTIONS = {
   idle: {
-    label: 'Waiting', colors: ['#3a4a73', '#8aa4d6', '#141b30'], dot: '#b8c7ea',
+    label: 'Waiting', colors: ['#9ad0ec', '#c7b8ea', '#f4c7d9', '#bde0fe', '#b8e8e0'], dot: '#c9d6ff', ink: '#7d8fc0', sparkle: 6, drift: -1,
     pulse: 0.15, wave: 'sine', speed: 60, pattern: 'single', interval: 2.6, hotspots: [],
     routes: [
       R('', ['brainstem', 'spineC', 'spineT', 'spineL', 'sacrum']),
@@ -34,7 +37,7 @@ const EMOTIONS = {
   },
 
   sadness: {
-    label: 'Sadness', colors: ['#1f4fff', '#7fb2ff', '#0b1440'], dot: '#9cc3ff',
+    label: 'Sadness', colors: ['#2f5bff', '#7fb2ff', '#3b2a8f', '#bcd9ff', '#1b2f7a'], dot: '#9cc3ff', ink: '#2446c9', sparkle: 10, drift: 1,
     pulse: 0.22, wave: 'sine', speed: 65, pattern: 'single', interval: 1.6,
     hotspots: ['heart', 'throat', 'eyeL', 'eyeR', 'templeL', 'templeR'],
     routes: [
@@ -55,7 +58,7 @@ const EMOTIONS = {
   },
 
   anger: {
-    label: 'Anger', colors: ['#8b0015', '#1a0005', '#ff2e3f'], dot: '#ff5364',
+    label: 'Anger', colors: ['#b3122e', '#3a0010', '#ff4d2e', '#6b0f2a', '#ff8a3d'], dot: '#ff5364', ink: '#a3102a', sparkle: 8, drift: -1,
     pulse: 1.4, wave: 'sharp', speed: 230, pattern: 'burst', interval: 0.55,
     hotspots: ['handL', 'handR', 'heart', 'mouth', 'templeL', 'templeR'],
     routes: [
@@ -77,7 +80,7 @@ const EMOTIONS = {
   },
 
   disbelief: {
-    label: 'Disbelief', colors: ['#ffffff', '#c9d6ff', '#6f7a99'], dot: '#ffffff',
+    label: 'Disbelief', colors: ['#ffffff', '#c9d6ff', '#8f98b8', '#e4defa', '#aab4d4'], dot: '#ffffff', ink: '#5d6788', sparkle: 6, drift: 0,
     pulse: 1.8, wave: 'flicker', speed: 120, pattern: 'parallel', interval: 1.2,
     hotspots: ['prefrontal', 'stomach', 'kneeL', 'kneeR'],
     routes: [
@@ -95,7 +98,7 @@ const EMOTIONS = {
   },
 
   fear: {
-    label: 'Fear', colors: ['#7b2ff7', '#d0b3ff', '#1b0a3d'], dot: '#d9c2ff',
+    label: 'Fear', colors: ['#6a2cff', '#b28dff', '#2a1466', '#4ad4ff', '#8e5cff'], dot: '#d9c2ff', ink: '#5a22d6', sparkle: 12, drift: 0,
     pulse: 1.7, wave: 'heartbeat', speed: 280, pattern: 'burst', interval: 0.45,
     hotspots: ['heart', 'stomach', 'handL', 'handR', 'amygdala'],
     routes: [
@@ -116,7 +119,7 @@ const EMOTIONS = {
   },
 
   joy: {
-    label: 'Joy', colors: ['#ffd23f', '#ff9f1c', '#fff6c9'], dot: '#ffe27a',
+    label: 'Joy', colors: ['#ffd23f', '#ff9f1c', '#fff17a', '#ff7b54', '#ffe9a8'], dot: '#ffe27a', ink: '#e07b00', sparkle: 30, drift: -1,
     pulse: 0.7, wave: 'sine', speed: 170, pattern: 'parallel', interval: 0.9,
     hotspots: ['reward', 'mouth', 'heart'],
     routes: [
@@ -137,7 +140,7 @@ const EMOTIONS = {
   },
 
   love: {
-    label: 'Love', colors: ['#ff3d7f', '#ffb3d1', '#ff7a59'], dot: '#ffc2dc',
+    label: 'Love', colors: ['#ff3d7f', '#ff9ecb', '#ff7a59', '#ffd1e3', '#c21e56'], dot: '#ffc2dc', ink: '#d81b60', sparkle: 14, drift: -1,
     pulse: 0.9, wave: 'heartbeat', speed: 110, pattern: 'pairs', interval: 1.4,
     hotspots: ['heart', 'mouth', 'stomach'],
     routes: [
@@ -157,7 +160,7 @@ const EMOTIONS = {
   },
 
   disgust: {
-    label: 'Disgust', colors: ['#8fd400', '#2f4a00', '#e0ff8a'], dot: '#c8f25a',
+    label: 'Disgust', colors: ['#8fd400', '#3fae4f', '#d8ff5a', '#5b6f00', '#b5e61d'], dot: '#c8f25a', ink: '#4f8a00', sparkle: 8, drift: 0,
     pulse: 0.9, wave: 'wobble', speed: 140, pattern: 'parallel', interval: 1.1,
     hotspots: ['stomach', 'throat', 'mouth', 'insula'],
     routes: [
@@ -177,7 +180,7 @@ const EMOTIONS = {
   },
 
   surprise: {
-    label: 'Surprise', colors: ['#00e5ff', '#ffffff', '#0077ff'], dot: '#bff9ff',
+    label: 'Surprise', colors: ['#00e5ff', '#7df9ff', '#3d7bff', '#ffffff', '#b6fffa'], dot: '#bff9ff', ink: '#0088cc', sparkle: 20, drift: -1,
     pulse: 2.0, wave: 'spike', speed: 320, pattern: 'burst', interval: 0.55,
     hotspots: ['eyeL', 'eyeR', 'heart', 'lungL', 'lungR'],
     routes: [
@@ -196,7 +199,7 @@ const EMOTIONS = {
   },
 
   stress: {
-    label: 'Stress', colors: ['#ff7a00', '#ffc27a', '#5c2400'], dot: '#ffb35c',
+    label: 'Stress', colors: ['#ff7a00', '#ffc27a', '#ff4d4d', '#8a3a00', '#ffe08a'], dot: '#ffb35c', ink: '#d45f00', sparkle: 10, drift: 0,
     pulse: 1.1, wave: 'sine', speed: 200, pattern: 'parallel', interval: 0.8,
     hotspots: ['stomach', 'shoulderL', 'shoulderR', 'templeL', 'templeR'],
     routes: [
@@ -217,7 +220,7 @@ const EMOTIONS = {
   },
 
   shame: {
-    label: 'Embarrassment', colors: ['#ff4d6d', '#b5179e', '#ffc2cc'], dot: '#ff9bb0',
+    label: 'Embarrassment', colors: ['#ff4d6d', '#b5179e', '#ffc2cc', '#ff8fa3', '#7b2cbf'], dot: '#ff9bb0', ink: '#d6264a', sparkle: 8, drift: -1,
     pulse: 0.9, wave: 'sine', speed: 150, pattern: 'parallel', interval: 1.0,
     hotspots: ['mouth', 'earL', 'earR', 'stomach'],
     routes: [
@@ -236,7 +239,7 @@ const EMOTIONS = {
   },
 
   calm: {
-    label: 'Calm', colors: ['#2ec4b6', '#b8f2e6', '#1d5c63'], dot: '#b8f2e6',
+    label: 'Calm', colors: ['#2ec4b6', '#7ae582', '#b8f2e6', '#48cae4', '#1d8a8a'], dot: '#b8f2e6', ink: '#138a80', sparkle: 12, drift: -1,
     pulse: 0.18, wave: 'sine', speed: 55, pattern: 'single', interval: 2.0,
     hotspots: ['lungL', 'lungR', 'heart'],
     routes: [
@@ -331,7 +334,7 @@ function buildPerception(senses) {
   const cortexPaths = [...new Set(s.map((x) => x.cortex))].map((c) => (c === 'prefrontal' ? ['thalamus', c] : ['thalamus', c, 'prefrontal']));
   const senseNames = s.map((x) => x.label).join(' and ');
   return {
-    label: 'Perception', colors: ['#e6eeff', '#8aa4d6', '#27324d'], dot: '#ffffff',
+    label: 'Perception', colors: ['#e6eeff', '#b8c7ea', '#8aa4d6', '#ffffff', '#cfd8ff'], dot: '#ffffff', ink: '#4b5f96', sparkle: 8, drift: -1,
     pulse: 0.35, wave: 'sine', speed: 150, pattern: 'single', interval: 0.95, hotspots: ['thalamus'],
     routes: [
       R(`Your ${senseNames} capture the information and send it to the thalamus, the relay station.`, ...s.flatMap((x) => x.paths)),

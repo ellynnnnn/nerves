@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,108 +7,121 @@
   <meta name="description" content="See how a situation travels through your nerves, brain and body.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <main class="layout">
-    <!-- LEFT: the text input and the explanations -->
-    <section class="panel">
-      <p class="eyebrow">Nerves</p>
-      <h1>How a feeling travels<br><em>through your whole body</em></h1>
-      <p class="intro">
-        Describe something that happened to you. Watch how the information enters
-        through your senses, is treated by different parts of the brain, and then
-        travels along your nerves to your heart, lungs, stomach, muscles and skin.
-      </p>
+  <div class="grain" aria-hidden="true"></div>
 
-      <label for="situation" class="label">Your situation</label>
-      <textarea id="situation" rows="4" placeholder="e.g. I lost my dog this morning…"></textarea>
-      <div class="actions">
-        <button id="go" class="btn-primary">Visualise</button>
-      </div>
+  <!-- Top left: title -->
+  <header class="brand">
+    <h1>Nerves</h1>
+    <p>How a feeling travels<br>through the whole body</p>
+  </header>
 
-      <div class="examples">
-        <span class="label">Try an example</span>
-        <div class="example-list">
-          <button class="chip" data-text="I lost my dog this morning.">I lost my dog</button>
-          <button class="chip" data-text="My best friends surprised me with a birthday party!">Surprise party</button>
-          <button class="chip" data-text="I found a hair in my soup at the restaurant. Yuck.">Hair in my soup</button>
-          <button class="chip" data-text="I have an oral exam tomorrow and I'm so stressed.">Oral exam tomorrow</button>
-          <button class="chip" data-text="My crush smiled at me and gave me a hug.">My crush hugged me</button>
-          <button class="chip" data-text="Someone was following me in a dark street.">Followed in the dark</button>
-          <button class="chip" data-text="I tripped in front of the whole class and everyone laughed at me.">I tripped in class</button>
-          <button class="chip" data-text="Lying on the beach, listening to the waves.">On the beach</button>
-        </div>
-      </div>
+  <!-- Top right: controls and light / dark switch -->
+  <nav class="top-controls">
+    <button id="pause" class="pill" aria-pressed="false">Pause</button>
+    <button id="replay" class="pill">Replay</button>
+    <button id="names" class="pill" aria-pressed="true">Names</button>
+    <button id="theme" class="theme-toggle" aria-label="Switch to dark mode">
+      <span class="knob">
+        <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><g stroke-width="1.8" stroke-linecap="round"><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></g></svg>
+        <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+      </span>
+    </button>
+  </nav>
 
-      <div id="result" hidden>
-        <h2>What you might feel</h2>
-        <p id="note" class="note" hidden></p>
-        <div id="emotions" class="emotion-list"></div>
-
-        <h2>The journey of the information</h2>
-        <ol id="steps" class="steps"></ol>
-      </div>
-
-      <p class="disclaimer">
-        A simplified model to help visualise emotions. Real bodies are more complex,
-        and this is not medical advice.
-      </p>
-    </section>
-
-    <!-- RIGHT: the body, the nerves and the aura -->
-    <section class="stage" id="stage">
-      <svg id="body" viewBox="-60 -30 520 850" role="img" aria-label="Body silhouette showing nerve connections">
+  <!-- Centre: the body -->
+  <main class="stage" id="stage">
+    <div class="figure" id="figure">
+      <div class="aura" id="aura" aria-hidden="true"></div>
+      <svg id="body" viewBox="-60 -20 520 850" role="img" aria-label="Body silhouette showing nerve connections">
         <defs>
-          <filter id="auraBlur" filterUnits="userSpaceOnUse" x="-200" y="-200" width="800" height="1200">
-            <feGaussianBlur stdDeviation="18"/>
-          </filter>
-          <filter id="edgeBlur" filterUnits="userSpaceOnUse" x="-200" y="-200" width="800" height="1200">
-            <feGaussianBlur stdDeviation="4"/>
-          </filter>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+          <filter id="blur6" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+          <filter id="blur14" filterUnits="userSpaceOnUse" x="-100" y="-100" width="600" height="1000"><feGaussianBlur stdDeviation="14"/></filter>
           <filter id="glow" x="-200%" y="-200%" width="500%" height="500%">
-            <feGaussianBlur stdDeviation="2.2" result="b"/>
+            <feGaussianBlur stdDeviation="2" result="b"/>
             <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
-          <linearGradient id="auraGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="800">
-            <stop offset="0"   stop-color="#8aa4d6"/>
-            <stop offset="0.5" stop-color="#e6eeff"/>
-            <stop offset="1"   stop-color="#27324d"/>
+          <linearGradient id="bodyFill" x1="0.15" y1="0" x2="0.85" y2="1">
+            <stop offset="0" class="body-stop-1"/>
+            <stop offset="1" class="body-stop-2"/>
           </linearGradient>
-          <radialGradient id="haloGrad" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0"   stop-color="#8aa4d6" stop-opacity="0.45"/>
-            <stop offset="1"   stop-color="#8aa4d6" stop-opacity="0"/>
-          </radialGradient>
-          <radialGradient id="hotGrad" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0"   stop-color="#8aa4d6" stop-opacity="0.9"/>
-            <stop offset="1"   stop-color="#8aa4d6" stop-opacity="0"/>
+          <radialGradient id="coreGrad" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#fff" stop-opacity="1"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
           </radialGradient>
           <clipPath id="bodyClip"><path id="clipShape"/></clipPath>
         </defs>
 
-        <ellipse id="halo" cx="200" cy="410" rx="230" ry="420" fill="url(#haloGrad)"/>
-        <g id="aura"></g>
-        <g id="silhouette"></g>
-        <g id="fine" clip-path="url(#bodyClip)"></g>
+        <ellipse class="floor" cx="200" cy="812" rx="130" ry="13" filter="url(#blur6)"/>
+        <g id="sparkles"></g>
+        <path id="bodyBase" fill="url(#bodyFill)" filter="url(#soft)"/>
+        <g clip-path="url(#bodyClip)">
+          <path id="bodyRim" class="body-rim" fill="none" stroke-width="40" filter="url(#blur14)"/>
+          <g id="innerGlow"></g>
+          <ellipse class="body-highlight" cx="170" cy="200" rx="60" ry="120" filter="url(#blur14)"/>
+          <g id="fine"></g>
+        </g>
         <g id="nerves"></g>
-        <g id="hotspots"></g>
+        <g id="afterglow"></g>
         <g id="trails"></g>
+        <g id="ripples"></g>
         <g id="nodes"></g>
         <g id="labels"></g>
       </svg>
-
-      <div id="caption" class="caption" aria-live="polite"></div>
-
-      <div class="stage-controls">
-        <button id="pause" class="ghost">Pause</button>
-        <button id="replay" class="ghost">Replay</button>
-        <label class="toggle"><input type="checkbox" id="names" checked> Show names</label>
-      </div>
-
-      <div id="tooltip" class="tooltip" hidden></div>
-    </section>
+    </div>
   </main>
+
+  <!-- Caption: what is happening right now -->
+  <aside class="caption" id="caption" aria-live="polite">
+    <span class="caption-emotion" id="captionEmotion"></span>
+    <span class="caption-text" id="captionText"></span>
+  </aside>
+
+  <!-- Floating card: can be moved anywhere -->
+  <section class="card" id="card" aria-label="Describe a situation">
+    <div class="card-handle" id="handle" title="Drag to move">
+      <span class="grip" aria-hidden="true"></span>
+      <span>Your situation</span>
+    </div>
+
+    <form class="input-row" id="form">
+      <textarea id="situation" rows="2" placeholder="e.g. I lost my dog this morning…"></textarea>
+      <button type="submit" class="send" aria-label="Visualise">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </form>
+
+    <div class="examples">
+      <button class="chip" data-text="I lost my dog this morning.">I lost my dog</button>
+      <button class="chip" data-text="My best friends surprised me with a birthday party!">Surprise party</button>
+      <button class="chip" data-text="I found a hair in my soup at the restaurant. Yuck.">Hair in my soup</button>
+      <button class="chip" data-text="I have an oral exam tomorrow and I'm so stressed.">Oral exam</button>
+      <button class="chip" data-text="My crush smiled at me and gave me a hug.">My crush hugged me</button>
+      <button class="chip" data-text="Someone was following me in a dark street.">Followed in the dark</button>
+      <button class="chip" data-text="I tripped in front of the whole class and everyone laughed at me.">I tripped in class</button>
+      <button class="chip" data-text="Lying on the beach, listening to the waves.">On the beach</button>
+    </div>
+
+    <button class="drawer-toggle" id="drawerToggle" aria-expanded="false" aria-controls="drawer" hidden>
+      <span>What you might feel · The journey</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="drawer" id="drawer" hidden>
+      <h2>What you might feel</h2>
+      <p id="note" class="note" hidden></p>
+      <div id="emotions" class="emotion-list"></div>
+      <h2>The journey of the information</h2>
+      <ol id="steps" class="steps"></ol>
+      <p class="disclaimer">A simplified model to help visualise emotions. Real bodies are more complex, and this is not medical advice.</p>
+    </div>
+  </section>
+
+  <div id="tooltip" class="tooltip" hidden></div>
 
   <script src="js/body.js"></script>
   <script src="js/emotions.js"></script>

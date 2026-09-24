@@ -7,28 +7,28 @@
 
 // Right half of the body outline. Each line = one curve: [control1 x,y, control2 x,y, end x,y].
 // The left half is created automatically as a mirror image.
-const SILHOUETTE_START = [200, 30];
+const SILHOUETTE_START = [200, 24];
 const SILHOUETTE_RIGHT = [
-  [228, 30, 248, 52, 248, 88],     // top and side of the head
-  [248, 118, 236, 140, 222, 150],  // jaw
-  [218, 156, 218, 162, 220, 170],  // neck
-  [240, 178, 270, 182, 288, 192],  // neck to shoulder
-  [304, 200, 310, 220, 312, 245],  // shoulder
-  [316, 300, 322, 350, 326, 400],  // outer arm
-  [328, 425, 334, 450, 332, 478],  // hand (outside)
-  [330, 494, 314, 496, 310, 482],  // finger tips
-  [306, 460, 302, 430, 300, 405],  // hand (inside)
-  [296, 360, 290, 310, 284, 262],  // inner arm up to the armpit
-  [282, 300, 268, 330, 266, 360],  // side of the chest to the waist
-  [266, 395, 284, 420, 284, 450],  // hip
-  [284, 520, 268, 570, 262, 620],  // thigh
-  [258, 670, 262, 720, 256, 760],  // calf
-  [262, 775, 268, 788, 250, 790],  // foot
-  [236, 792, 228, 786, 230, 770],  // inside of the foot
-  [232, 720, 226, 670, 226, 620],  // inner calf
-  [224, 570, 214, 520, 206, 480],  // inner thigh
-  [204, 474, 202, 470, 200, 468],  // between the legs
+  [233, 24, 253, 52, 253, 90],     // top and side of the head (round, like a soft 3D figure)
+  [253, 126, 240, 148, 224, 157],  // jaw
+  [217, 161, 216, 166, 222, 172],  // short neck
+  [250, 176, 283, 180, 299, 198],  // neck to shoulder
+  [317, 216, 323, 245, 325, 275],  // round shoulder
+  [329, 330, 337, 380, 341, 420],  // outer arm
+  [345, 452, 347, 482, 331, 496],  // mitten hand (no fingers)
+  [314, 508, 297, 493, 295, 470],  // inside of the hand
+  [291, 420, 286, 340, 282, 272],  // inner arm up to the armpit
+  [280, 310, 270, 340, 270, 370],  // side of the chest to the waist
+  [270, 400, 291, 425, 291, 462],  // hip
+  [291, 540, 275, 590, 271, 640],  // thigh
+  [267, 690, 273, 735, 267, 765],  // calf
+  [279, 782, 277, 802, 250, 802],  // round foot
+  [229, 802, 223, 789, 225, 770],  // inside of the foot
+  [227, 720, 224, 680, 222, 630],  // inner calf
+  [220, 570, 212, 515, 206, 488],  // inner thigh
+  [204, 480, 202, 476, 200, 474],  // between the legs
 ];
+
 
 // Every point where information goes. type: brain | sense | organ | nerve
 const NODES = {
