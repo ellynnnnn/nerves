@@ -12,26 +12,19 @@
 </head>
 <body class="intro-open">
   <!-- HOME / LOADING PAGE -->
-  <section class="intro" id="intro" aria-label="Welcome">
+  <section class="intro" id="intro" aria-label="Loading Nerves">
     <div class="intro-mist" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
-    <div class="intro-body" id="introBody" aria-hidden="true">
-      <svg class="intro-glow" viewBox="-60 -20 520 850"><defs>
-        <radialGradient id="introFill" cx="0.5" cy="0.38" r="0.6">
-          <stop offset="0" stop-color="#fff6c9"/><stop offset="0.35" stop-color="#ffd39a"/>
-          <stop offset="0.7" stop-color="#ff9fb8"/><stop offset="1" stop-color="#c7a8ff"/>
-        </radialGradient></defs>
-        <path id="introShape" fill="url(#introFill)"/>
-      </svg>
-      <canvas id="introCanvas"></canvas>
+    <canvas id="introCanvas" class="intro-particles" aria-hidden="true"></canvas>
+    <div class="intro-center">
+      <pre class="ascii" id="ascii" aria-hidden="true"></pre>
+      <div class="intro-words" id="introWords">
+        <h1 class="intro-title">Nerves</h1>
+        <p class="intro-tagline">A feeling is not only in your head or in your heart.<br>It travels through your whole body.</p>
+      </div>
     </div>
-    <div class="intro-text">
-      <h1 class="intro-title">Nerves</h1>
-      <p class="intro-tagline">A feeling is not only in your head or in your heart.<br>It travels through your whole body.</p>
-      <div class="loader" id="loader"><span class="loader-bar"><span id="loaderFill"></span></span><span class="loader-pct" id="loaderPct">0%</span></div>
-      <button class="enter" id="enter" hidden>Enter <span aria-hidden="true">→</span></button>
-    </div>
+    <button class="skip" id="skip">Skip <svg class="pixel-arrow" viewBox="0 0 12 9" aria-hidden="true" shape-rendering="crispEdges"><path d="M0 4h12v1H0zM7 1h1v1H7zM8 2h1v1H8zM9 3h1v3H9zM8 6h1v1H8zM7 7h1v1H7z"/></svg></button>
   </section>
 
   <div class="grain" aria-hidden="true"></div>
@@ -133,7 +126,7 @@
     <form class="input-row" id="form">
       <textarea id="situation" rows="2" placeholder="e.g. I lost my dog this morning…"></textarea>
       <button type="submit" class="send" aria-label="Visualise">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg class="pixel-arrow" viewBox="0 0 12 9" aria-hidden="true" shape-rendering="crispEdges"><path d="M0 4h12v1H0zM7 1h1v1H7zM8 2h1v1H8zM9 3h1v3H9zM8 6h1v1H8zM7 7h1v1H7z"/></svg>
       </button>
     </form>
 
@@ -146,6 +139,12 @@
       <button class="chip" data-text="Someone was following me in a dark street.">Followed in the dark</button>
       <button class="chip" data-text="I tripped in front of the whole class and everyone laughed at me.">I tripped in class</button>
       <button class="chip" data-text="Lying on the beach, listening to the waves.">On the beach</button>
+      <button class="chip" data-text="I'm reading a really good book.">Reading a book</button>
+      <button class="chip" data-text="I fell off my bike and hurt my knee.">I hurt my knee</button>
+      <button class="chip" data-text="I'm so tired after a long day at school.">So tired</button>
+      <button class="chip" data-text="My best friend got the phone I wanted. I'm jealous.">Jealous</button>
+      <button class="chip" data-text="I finally finished my project and I'm proud of myself.">Proud of myself</button>
+      <button class="chip" data-text="I'm bored, there is nothing to do.">Bored</button>
     </div>
 
     <button class="drawer-toggle" id="drawerToggle" aria-expanded="false" aria-controls="drawer" hidden>

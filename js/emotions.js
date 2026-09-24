@@ -136,7 +136,7 @@ const EMOTIONS = {
       'Energy flows to the arms and legs: you want to move.',
       'The hippocampus records the moment as a happy memory.',
     ],
-    words: ['happy', 'happiness', 'joy', 'excited', 'exciting', 'great', 'amazing', 'awesome', 'fun', 'laugh', 'laughing', 'laughter', 'party', 'celebrat*', 'glad', 'proud', 'heureux', 'heureuse', 'joie', 'génial'],
+    words: ['happy', 'happiness', 'joy', 'excited', 'exciting', 'great', 'amazing', 'awesome', 'fun', 'laugh', 'laughing', 'laughter', 'party', 'celebrat*', 'glad', 'heureux', 'heureuse', 'joie', 'génial'],
   },
 
   love: {
@@ -256,7 +256,156 @@ const EMOTIONS = {
     ],
     words: ['relax*', 'calm*', 'peace*', 'beach', 'meditat*', 'breath*', 'relief', 'relieved', 'safe', 'nature', 'bath', 'cosy', 'cozy', 'quiet', 'sunset', 'waves', 'soulag*', 'tranquille'],
   },
+  focus: {
+    label: 'Focus', colors: ['#3a5bd9', '#7fd1e8', '#dfe7ff', '#6c4ee0', '#a8f0ff'], dot: '#bfe6ff', ink: '#2f4fc4', sparkle: 8, drift: 0,
+    pulse: 0.3, wave: 'sine', speed: 90, pattern: 'single', interval: 1.4,
+    hotspots: ['prefrontal', 'eyeL', 'eyeR', 'hippocampus'],
+    routes: [
+      R('Your eyes jump from word to word and send them to the visual cortex.', ['eyeL', 'thalamus', 'visual'], ['eyeR', 'thalamus']),
+      R('The brain turns the letters into sounds and meaning.', ['visual', 'prefrontal', 'auditory']),
+      R('The hippocampus builds images and links the story to your memories: you imagine the scene.', ['prefrontal', 'hippocampus', 'prefrontal']),
+      R('Curiosity: a little dopamine makes you want to know what happens next.', ['thalamus', 'reward', 'prefrontal']),
+      R('The story touches you: the emotional brain reacts as if it were real.', ['prefrontal', 'amygdala', 'hypothalamus', 'brainstem', 'throat', 'heart']),
+      R('The body is still and calm: slow breathing.', ['brainstem', 'throat', 'lungL'], ['throat', 'lungR']),
+    ],
+    steps: [
+      'The eyes send the words to the visual cortex, and the brain turns them into sounds and meaning.',
+      'The prefrontal cortex keeps your attention, while the hippocampus creates images and links them to your memories.',
+      'Curiosity releases a little dopamine: you want to know what happens next.',
+      'The emotional brain reacts to the story as if it were real, while the body stays calm and still.',
+    ],
+    words: ['reading', 'read', 'book*', 'novel', 'stud*', 'concentrat*', 'focus*', 'puzzle*', 'learn*', 'lire', 'livre*', 'lecture', 'roman'],
+  },
+
+  pain: {
+    label: 'Pain', colors: ['#ff3b30', '#ff9f0a', '#7a0a1f', '#ffd60a', '#c2185b'], dot: '#ff8a7a', ink: '#d0021b', sparkle: 6, drift: 0,
+    pulse: 1.1, wave: 'sharp', speed: 260, pattern: 'burst', interval: 0.65,
+    hotspots: ['kneeL', 'insula', 'thalamus'],
+    routes: [], steps: [],   // built by buildPain(), depending on WHERE it hurts
+    words: ['pain*', 'hurt*', 'ache*', 'aching', 'injur*', 'bleed*', 'bled', 'sprain*', 'burn*', 'bruise*', 'headache', 'migraine', 'toothache', 'broke my', 'broken arm', 'broken leg', 'douleur', 'mal', 'blessé*', 'blessure'],
+  },
+
+  tiredness: {
+    label: 'Tiredness', colors: ['#8e9aaf', '#cbc0d3', '#5c6784', '#efd3d7', '#3d4a6b'], dot: '#cbc0d3', ink: '#5c6784', sparkle: 4, drift: 1,
+    pulse: 0.15, wave: 'sine', speed: 40, pattern: 'single', interval: 2.4,
+    hotspots: ['eyeL', 'eyeR', 'prefrontal', 'kneeL', 'kneeR'],
+    routes: [
+      R('Adenosine builds up in the brain all day long: the pressure to sleep grows.', ['prefrontal', 'thalamus', 'hypothalamus']),
+      R('The prefrontal cortex slows down: it is hard to concentrate and to remember.', ['prefrontal', 'hippocampus']),
+      R('Heavy eyelids, you yawn.', ['brainstem', 'eyeL'], ['brainstem', 'eyeR'], ['brainstem', 'mouth']),
+      R('A big yawn brings in more air.', ['brainstem', 'throat', 'lungL'], ['throat', 'lungR']),
+      R('Your muscles feel heavy and slow.', LEGS[0], LEGS[1], ARMS[0]),
+    ],
+    steps: [
+      'During the day, a molecule called adenosine builds up in the brain: it creates the need to sleep.',
+      'The hypothalamus (your inner clock) tells the body it is time to rest.',
+      'The prefrontal cortex slows down: concentration and memory become harder.',
+      'Heavy eyelids, yawns, slow and heavy muscles.',
+    ],
+    words: ['tired', 'exhausted', 'sleepy', 'fatigue*', 'no energy', 'long day', "didn't sleep", "couldn't sleep", 'insomnia', 'yawn*', 'fatigué*', 'épuisé*', 'sommeil', 'crevé*'],
+  },
+
+  jealousy: {
+    label: 'Jealousy', colors: ['#3fae4f', '#1b5e20', '#c6ff00', '#6a1b9a', '#ffb300'], dot: '#b7f07a', ink: '#2e7d32', sparkle: 8, drift: 0,
+    pulse: 0.9, wave: 'wobble', speed: 170, pattern: 'parallel', interval: 0.9,
+    hotspots: ['stomach', 'heart', 'amygdala'],
+    routes: [
+      R('The brain compares you with someone else.', ['prefrontal', 'insula', 'amygdala']),
+      R('The reward system feels that something is missing.', ['reward', 'prefrontal']),
+      R('Stress hormones are released.', ['amygdala', 'hypothalamus', 'brainstem', 'spineC', 'spineT', 'adrenal']),
+      R('A tight chest and a knot in the stomach.', ['brainstem', 'throat', 'heart', 'stomach']),
+      R('The same thoughts come back again and again.', ['hippocampus', 'prefrontal', 'hippocampus']),
+    ],
+    steps: [
+      'The prefrontal cortex and the insula compare your situation with someone else’s.',
+      'The reward system feels a lack, and the amygdala sees it as a threat.',
+      'Stress hormones: a tight chest, a knot in the stomach.',
+      'The same thoughts loop between memory and the thinking brain.',
+    ],
+    words: ['jealous*', 'envy', 'envious', 'jaloux', 'jalouse', 'jalousie'],
+  },
+
+  pride: {
+    label: 'Pride', colors: ['#ffb703', '#fb8500', '#8338ec', '#ffd166', '#ff006e'], dot: '#ffd166', ink: '#d97706', sparkle: 22, drift: -1,
+    pulse: 0.6, wave: 'sine', speed: 150, pattern: 'parallel', interval: 1.0,
+    hotspots: ['heart', 'reward', 'shoulderL', 'shoulderR'],
+    routes: [
+      R('Dopamine and serotonin: the reward of a job well done.', ['thalamus', 'reward', 'prefrontal']),
+      R('You stand taller: shoulders open, chest out.', ['spineC', 'shoulderL'], ['spineC', 'shoulderR'], ['spineC', 'spineT']),
+      R('A deep breath of satisfaction.', ['brainstem', 'throat', 'lungL'], ['throat', 'lungR']),
+      R('Warmth in the chest.', ['hypothalamus', 'brainstem', 'throat', 'heart']),
+      R('The hippocampus remembers the success: it will motivate you next time.', ['reward', 'hippocampus']),
+      R('You smile.', ['reward', 'hypothalamus', 'mouth']),
+    ],
+    steps: [
+      'The reward system releases dopamine and serotonin: the feeling of a job well done.',
+      'The body opens: you stand taller, shoulders back, chest out, a deep breath.',
+      'The hippocampus stores the success, which gives you motivation for next time.',
+    ],
+    words: ['proud', 'pride', 'achiev*', 'accomplish*', 'fier', 'fière', 'finally did it', 'finally finished'],
+  },
+
+  boredom: {
+    label: 'Boredom', colors: ['#b0b7c3', '#d8d2c4', '#9aa5b1', '#e8e3d9', '#7d8597'], dot: '#d8d2c4', ink: '#6b7280', sparkle: 3, drift: 0,
+    pulse: 0.12, wave: 'sine', speed: 35, pattern: 'single', interval: 3.0,
+    hotspots: ['prefrontal'],
+    routes: [
+      R('Nothing new: the reward system gets almost no dopamine.', ['thalamus', 'reward']),
+      R('Attention wanders: the brain looks for something else to do.', ['prefrontal', 'visual', 'auditory', 'prefrontal']),
+      R('You yawn and fidget.', ['brainstem', 'mouth'], ARMS[0]),
+      R('Time seems to pass very slowly.', ['prefrontal', 'hippocampus']),
+    ],
+    steps: [
+      'Nothing new happens: the reward system receives almost no dopamine.',
+      'The prefrontal cortex looks for something more interesting: attention wanders.',
+      'The body gets restless: yawns, fidgeting, and time seems very slow.',
+    ],
+    words: ['bored', 'boring', 'nothing to do', 'ennui', "m'ennuie", 'ennuy*'],
+  },
 };
+
+/* ---------- Pain depends on where it hurts ---------- */
+const PAIN_PARTS = {
+  leg:     { words: ['knee*', 'leg*', 'foot', 'feet', 'ankle*', 'toe*', 'genou*', 'jambe*', 'pied*', 'cheville*'],
+             up: ['footL', 'kneeL', 'hipL', 'sacrum', 'spineL', 'spineT', 'spineC', 'brainstem', 'thalamus'],
+             reflex: ['spineL', 'sacrum', 'hipL', 'kneeL', 'footL'], spot: 'kneeL', where: 'leg' },
+  arm:     { words: ['hand*', 'arm*', 'finger*', 'wrist*', 'elbow*', 'main*', 'bras', 'doigt*', 'poignet*'],
+             up: ['handR', 'elbowR', 'shoulderR', 'spineC', 'brainstem', 'thalamus'],
+             reflex: ['spineC', 'shoulderR', 'elbowR', 'handR'], spot: 'handR', where: 'hand' },
+  head:    { words: ['head*', 'migraine', 'tête', 'crâne'],
+             up: ['templeL', 'eyeL', 'thalamus'], up2: ['templeR', 'eyeR', 'thalamus'], spot: 'templeL', spot2: 'templeR', where: 'head' },
+  stomach: { words: ['stomach*', 'belly', 'tummy', 'ventre', 'estomac'],
+             up: ['gut', 'stomach', 'heart', 'throat', 'brainstem', 'thalamus'], spot: 'stomach', where: 'stomach' },
+  tooth:   { words: ['tooth', 'teeth', 'toothache', 'mouth', 'dent*'],
+             up: ['mouth', 'brainstem', 'thalamus'], spot: 'mouth', where: 'mouth' },
+  back:    { words: ['back', 'dos'],
+             up: ['sacrum', 'spineL', 'spineT', 'spineC', 'brainstem', 'thalamus'], spot: 'spineL', where: 'back' },
+};
+
+function buildPain(partKey) {
+  const part = PAIN_PARTS[partKey] || PAIN_PARTS.leg;
+  const ups = [part.up].concat(part.up2 ? [part.up2] : []);
+  const routes = [
+    R(`Pain sensors in your ${part.where} send an alarm up the nerves and the spinal cord.`, ...ups),
+    R('The thalamus sends the signal to the insula: you feel how much it hurts.', ['thalamus', 'insula']),
+    R('The cortex locates the pain and the amygdala adds the fear of getting hurt again.', ['thalamus', 'prefrontal'], ['thalamus', 'amygdala']),
+    R('Your heart beats faster and you breathe quickly.', ['hypothalamus', 'brainstem', 'throat', 'heart'], ['throat', 'lungL']),
+    R('Tears can come to your eyes.', ['brainstem', 'eyeL'], ['brainstem', 'eyeR']),
+    R('The brain releases endorphins, natural painkillers, that go down the spinal cord to calm the pain.', ['hypothalamus', 'brainstem', 'spineC', 'spineT', 'spineL']),
+  ];
+  if (part.reflex) routes.splice(1, 0, R('Reflex! The spinal cord makes you pull away before the brain even knows.', part.reflex));
+  return {
+    ...EMOTIONS.pain,
+    hotspots: [part.spot, part.spot2, 'insula', 'thalamus'].filter(Boolean),
+    routes,
+    steps: [
+      `Pain sensors (nociceptors) in your ${part.where} send an electric alarm along the nerves to the spinal cord.`,
+      part.reflex ? 'Reflex: the spinal cord answers straight away and makes you pull away, before the brain even knows.' : 'The signal climbs up to the brainstem very fast.',
+      'The thalamus sends it to the insula and the cortex: you feel where it hurts and how much.',
+      'Heart and breathing speed up. Then the brain releases endorphins, natural painkillers, to calm the pain.',
+    ],
+  };
+}
 
 // Situations that usually bring SEVERAL emotions, in this order.
 const SCENARIOS = [
@@ -270,7 +419,7 @@ const SCENARIOS = [
 // How the information ENTERS the body.
 const SENSES = {
   eyes:  { label: 'eyes', cortex: 'visual', paths: [['eyeL', 'thalamus'], ['eyeR', 'thalamus']],
-           words: ['saw', 'see', 'seen', 'seeing', 'watch*', 'look*', 'read', 'text*', 'message*', 'photo*', 'video*', 'vu', 'regard*'] },
+           words: ['saw', 'see', 'seen', 'seeing', 'watch*', 'look*', 'read', 'reading', 'book*', 'text*', 'message*', 'photo*', 'video*', 'vu', 'regard*'] },
   ears:  { label: 'ears', cortex: 'auditory', paths: [['earL', 'thalamus'], ['earR', 'thalamus']],
            words: ['heard', 'hear*', 'told', 'tell*', 'said', 'say*', 'call*', 'phone*', 'voice', 'listen*', 'music', 'noise', 'scream*', 'shout*', 'yell*', 'laughed at', 'entendu', 'dit'] },
   nose:  { label: 'nose', cortex: 'insula', paths: [['nose', 'insula']],
@@ -324,6 +473,10 @@ function analyseSituation(raw) {
   // 2. Senses
   const senses = Object.keys(SENSES).filter((k) => firstMatch(text, SENSES[k].words) !== -1).slice(0, 2);
   if (senses.length === 0) senses.push('eyes', 'ears');
+
+  // 3. Where does it hurt?
+  const painPart = Object.keys(PAIN_PARTS).find((k) => firstMatch(text, PAIN_PARTS[k].words) !== -1) || 'leg';
+  EMOTIONS.pain = buildPain(painPart);
 
   return { emotions: found.slice(0, 4), senses, guessed };
 }

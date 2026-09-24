@@ -85,7 +85,9 @@
 
   CHAINS.forEach((c) => addChain(c.nodes, c.width));
   // Make sure every journey in emotions.js follows a drawn nerve.
-  const allRouteSets = Object.values(EMOTIONS).concat(Object.keys(SENSES).map((s) => buildPerception([s])));
+  const allRouteSets = Object.values(EMOTIONS)
+    .concat(Object.keys(SENSES).map((s) => buildPerception([s])))
+    .concat(Object.keys(PAIN_PARTS).map(buildPain));
   allRouteSets.forEach((e) => e.routes.forEach((r) => r.paths.forEach((p) => {
     for (let i = 0; i < p.length - 1; i++) if (!EDGES[key(p[i], p[i + 1])]) addChain([p[i], p[i + 1]]);
   })));
@@ -225,6 +227,8 @@
     love: { spread: 0.75, sink: 0 }, joy: { spread: 1.3, sink: -10 }, calm: { spread: 1.2, sink: 0 },
     surprise: { spread: 1.2, sink: -15 }, sadness: { spread: 0.95, sink: 30 }, fear: { spread: 0.9, sink: 0 },
     anger: { spread: 1.05, sink: -10 }, shame: { spread: 0.85, sink: -20 },
+    tiredness: { spread: 0.9, sink: 35 }, boredom: { spread: 0.95, sink: 20 }, pride: { spread: 1.25, sink: -20 },
+    focus: { spread: 0.85, sink: -25 }, pain: { spread: 0.95, sink: 0 }, jealousy: { spread: 1.0, sink: 0 },
   };
   let pxPerUnit = 1;
   const measureFigure = () => { pxPerUnit = $('#figure').clientWidth / VB.w; };

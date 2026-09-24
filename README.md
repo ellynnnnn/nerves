@@ -1,6 +1,6 @@
 # Nerves: how a feeling travels through your body
 
-It opens on a dreamy home page: a close-up of the body that slowly zooms out while glowing dots travel along the nerves.
+It opens on a dreamy loading page: colour glows and flying dots, and in the centre an ASCII animation where a body builds itself, turns into a beating heart, then into the word NERVES, which melts into the title before the page opens.
 Then, type a situation ("I lost my dog", "My crush hugged me"…) and watch:
 
 - the **aura** around the body change colour and rhythm with each emotion,
@@ -10,6 +10,9 @@ Then, type a situation ("I lost my dog", "My crush hugged me"…) and watch:
 
 Light mode by default, dark mode with the switch at the top right. Fast rhythms pulse more softly
 so the light never flashes in your eyes (and everything slows down if your device asks for reduced motion).
+
+Feelings it recognises: sadness, anger, disbelief, fear, joy, love, disgust, surprise, stress, embarrassment, calm,
+focus (reading, studying), pain (it finds where it hurts: leg, hand, head, stomach, tooth, back), tiredness, jealousy, pride and boredom.
 
 ## How to open it
 
@@ -23,7 +26,7 @@ It is a simple website with no installation. Download the folder and double-clic
 | Position of the body parts, shape of the silhouette | `js/body.js` |
 | Fonts, light / dark colours, page layout | `css/style.css` |
 | Title, home page text, example buttons | `index.html` |
-| Home page animation (dots, zoom, loading time) | `js/intro.js` |
+| Loading page animation (ASCII shapes, timing, dots) | `js/intro.js` |
 | Number of nerve strands in the arms, legs, spine | `BUNDLES` in `js/body.js` |
 
 ## Put it online for free (GitHub Pages)

@@ -1,17 +1,56 @@
 /*
- * intro.js — the home / loading page.
- * A close-up of the body that slowly zooms out, with glowing dots
- * travelling along the nerves, then an "Enter" button.
+ * intro.js — the loading page.
+ * Colour glows + flying dots in the background, and in the centre an ASCII
+ * animation: a body builds itself, becomes a beating heart, then the word
+ * NERVES, which melts into the real title. Then the page opens.
  */
 (function () {
   const intro = document.getElementById('intro');
-  const canvas = document.getElementById('introCanvas');
-  const ctx = canvas.getContext('2d');
-  const VB = { x: -60, y: -20, w: 520, h: 850 };
-  const LOAD_SECONDS = 3.6;   // minimum time the loading bar takes
+  const pre = document.getElementById('ascii');
+  const words = document.getElementById('introWords');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- The glowing body shape ---------- */
-  (function drawShape() {
+  // Timeline, in seconds (change these to make the intro faster or slower)
+  const T = {
+    build: [0.2, 3.0],     // the body builds itself, from the feet to the head
+    toHeart: [3.8, 5.2],   // the body turns into a heart
+    beat: [5.2, 7.0],      // the heart beats
+    toText: [7.0, 8.4],    // the heart turns into the word NERVES
+    title: 9.4,            // the ASCII melts into the real title
+    open: 11.6,            // the page opens
+  };
+  if (reduceMotion) Object.assign(T, { build: [0, 0.1], toHeart: [0.1, 0.2], beat: [0.2, 0.3], toText: [0.3, 0.4], title: 0.4, open: 2.6 });
+
+  /* ---------- ASCII grid ---------- */
+  const COLS = 64, ROWS = 46;
+  const CW = 6, CH = 10;                  // a character is about 6 wide for 10 high
+  const W = COLS * CW, H = ROWS * CH;
+  const N = COLS * ROWS;
+  const CHARS = ' .,:;!*+a2S$0Q%&8@';
+  const SCRAMBLE = '!*+a2S$0Q%&8@#?/\\<>';
+
+  // Draw a shape on a hidden canvas, then measure how much of each character cell it covers.
+  function mask(draw) {
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#000';
+    draw(g);
+    const data = g.getImageData(0, 0, W, H).data;
+    const out = new Float32Array(N);
+    for (let r = 0; r < ROWS; r++) {
+      for (let col = 0; col < COLS; col++) {
+        let sum = 0;
+        for (let y = r * CH; y < (r + 1) * CH; y += 2) {
+          for (let x = col * CW; x < (col + 1) * CW; x += 2) sum += data[(y * W + x) * 4 + 3];
+        }
+        out[r * COLS + col] = sum / (255 * (CW / 2) * (CH / 2));
+      }
+    }
+    return out;
+  }
+
+  function silhouette() {
     const mirror = (x) => 400 - x;
     let d = `M${SILHOUETTE_START.join(',')}`;
     for (const s of SILHOUETTE_RIGHT) d += ` C${s.join(',')}`;
@@ -20,170 +59,197 @@
       const end = i > 0 ? SILHOUETTE_RIGHT[i - 1].slice(4) : SILHOUETTE_START;
       d += ` C${mirror(s[2])},${s[3]},${mirror(s[0])},${s[1]},${mirror(end[0])},${end[1]}`;
     }
-    document.getElementById('introShape').setAttribute('d', d + 'Z');
-  })();
-
-  /* ---------- Nerves to draw ---------- */
-  const strands = buildNerveStrands();
-  // a small web of neurons in the head
-  let seed = 5;
-  const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const pts = Array.from({ length: 38 }, () => {
-    const a = rand() * Math.PI * 2, r = Math.sqrt(rand());
-    return { x: 200 + Math.cos(a) * r * 42, y: 86 + Math.sin(a) * r * 50 };
-  });
-  pts.forEach((p, i) => {
-    pts.map((q, j) => ({ q, d: Math.hypot(p.x - q.x, p.y - q.y), j }))
-      .filter((o) => o.j > i).sort((a, b) => a.d - b.d).slice(0, 2)
-      .forEach((o) => strands.push([p, o.q]));
-  });
-
-  // length of each strand, to move the dots at a constant speed
-  const lines = strands.map((pts) => {
-    const acc = [0];
-    for (let i = 1; i < pts.length; i++) acc.push(acc[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
-    return { pts, acc, len: acc[acc.length - 1] };
-  }).filter((l) => l.len > 4);
-  const totalLen = lines.reduce((s, l) => s + l.len, 0);
-  function randomLine() {
-    let r = Math.random() * totalLen;
-    for (const l of lines) { r -= l.len; if (r <= 0) return l; }
-    return lines[0];
-  }
-  function pointAt(l, s) {
-    let i = 1;
-    while (i < l.acc.length - 1 && l.acc[i] < s) i++;
-    const a = l.pts[i - 1], b = l.pts[i];
-    const t = (s - l.acc[i - 1]) / ((l.acc[i] - l.acc[i - 1]) || 1);
-    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    return new Path2D(d + 'Z');
   }
 
-  /* ---------- Glowing dot images (drawn once, reused) ---------- */
-  const COLORS = ['#ffffff', '#ffd6a5', '#ffadc6', '#a0c4ff', '#bdb2ff', '#b9f3d0'];
+  const bodyMask = mask((g) => {
+    const sc = (H - 16) / 778;              // the body is 778 units tall (y 24 → 802)
+    g.translate(W / 2 - 200 * sc, 8 - 24 * sc);
+    g.scale(sc, sc);
+    g.fill(silhouette());
+  });
+
+  function heart(scale) {
+    return mask((g) => {
+      const k = 9.2 * scale;
+      g.translate(W / 2, H / 2 - 10);
+      g.beginPath();
+      for (let i = 0; i <= 100; i++) {
+        const t = (i / 100) * Math.PI * 2;
+        const x = 16 * Math.sin(t) ** 3;
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        g.lineTo(x * k, -y * k);
+      }
+      g.fill();
+    });
+  }
+  const heartSmall = heart(1), heartBig = heart(1.1);
+
+  const textMask = mask((g) => {
+    g.font = '900 100px system-ui, "Arial Black", sans-serif';
+    const w = g.measureText('NERVES').width;
+    const size = 100 * (W - 20) / w;
+    g.font = `900 ${size}px system-ui, "Arial Black", sans-serif`;
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.translate(W / 2, H / 2);
+    g.scale(1, 2.4);                        // tall letters, like an ASCII banner
+    g.fillText('NERVES', 0, 0);
+    g.lineWidth = size * 0.06;              // thicker letters, easier to read in characters
+    g.lineJoin = 'round';
+    g.strokeText('NERVES', 0, 0);
+  });
+
+  // Each cell changes shape at its own moment: it looks organic, not mechanical.
+  const rnd = () => Math.random();
+  const switchAt = [
+    Float32Array.from({ length: N }, (_, i) => {
+      const fromBottom = 1 - Math.floor(i / COLS) / ROWS;       // build from the feet up
+      return T.build[0] + (T.build[1] - T.build[0]) * (0.75 * fromBottom + 0.25 * rnd());
+    }),
+    Float32Array.from({ length: N }, () => T.toHeart[0] + (T.toHeart[1] - T.toHeart[0]) * rnd()),
+    Float32Array.from({ length: N }, () => T.toText[0] + (T.toText[1] - T.toText[0]) * rnd()),
+  ];
+  const noise = Float32Array.from({ length: N }, rnd);
+
+  function heartbeat(t) {
+    const x = (t * 1.2) % 1;
+    return Math.exp(-(((x - 0.1) / 0.07) ** 2)) + 0.7 * Math.exp(-(((x - 0.32) / 0.07) ** 2));
+  }
+
+  function shapeValue(k, i, t) {
+    if (k === 1) return bodyMask[i];
+    if (k === 2) return (t > T.beat[0] && heartbeat(t - T.beat[0]) > 0.5 ? heartBig : heartSmall)[i];
+    if (k === 3) return textMask[i];
+    return 0;
+  }
+
+  function renderAscii(t) {
+    let out = '';
+    for (let i = 0; i < N; i++) {
+      if (i && i % COLS === 0) out += '\n';
+      let k = 0, since = 99;
+      for (let s = switchAt.length - 1; s >= 0; s--) {
+        if (t >= switchAt[s][i]) { k = s + 1; since = t - switchAt[s][i]; break; }
+      }
+      const v = shapeValue(k, i, t);
+      const before = k > 0 ? shapeValue(k - 1, i, t) : 0;
+      if (since < 0.22 && (v > 0.1 || before > 0.1)) {
+        out += SCRAMBLE[Math.floor(rnd() * SCRAMBLE.length)];       // the character is "changing"
+      } else if (v > 0.12) {
+        const d = v * (0.35 + 0.65 * noise[i]);
+        out += CHARS[1 + Math.floor(d * (CHARS.length - 2))];
+      } else {
+        out += ' ';
+      }
+    }
+    pre.textContent = out;
+    // a few characters shimmer
+    for (let j = 0; j < 60; j++) noise[Math.floor(rnd() * N)] = rnd();
+  }
+
+  function fitAscii() {
+    const size = Math.min(13, (innerWidth - 32) / (COLS * 0.61), (innerHeight * 0.7) / ROWS);
+    pre.style.fontSize = size.toFixed(2) + 'px';
+  }
+  fitAscii();
+  window.addEventListener('resize', fitAscii);
+
+  /* ---------- Flying dots in the background ---------- */
+  const canvas = document.getElementById('introCanvas');
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['#ffffff', '#ffd23f', '#ff7aa8', '#7fb2ff', '#b28dff', '#2ec4b6'];
   const sprites = COLORS.map((c) => {
     const s = document.createElement('canvas');
-    s.width = s.height = 64;
+    s.width = s.height = 48;
     const g = s.getContext('2d');
-    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    const grad = g.createRadialGradient(24, 24, 0, 24, 24, 24);
     grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(0.18, c);
-    grad.addColorStop(0.45, c + '66');
+    grad.addColorStop(0.2, c);
+    grad.addColorStop(0.5, c + '55');
     grad.addColorStop(1, c + '00');
     g.fillStyle = grad;
-    g.fillRect(0, 0, 64, 64);
+    g.fillRect(0, 0, 48, 48);
     return s;
   });
-
-  const dots = Array.from({ length: 110 }, () => newDot(true));
-  function newDot(anywhere) {
-    const l = randomLine();
-    const back = Math.random() < 0.4;   // some signals go up to the brain, some go down
-    return {
-      l, back, s: anywhere ? Math.random() * l.len : 0,
-      speed: 25 + Math.random() * 70, size: 5 + Math.random() * 7,
-      sprite: sprites[Math.floor(Math.random() * sprites.length)],
-    };
+  let dpr = 1;
+  function resizeCanvas() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = innerWidth * dpr;
+    canvas.height = innerHeight * dpr;
   }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  const flyers = Array.from({ length: 80 }, () => ({
+    x: rnd() * innerWidth, y: rnd() * innerHeight,
+    speed: 30 + rnd() * 90, size: 4 + rnd() * 9, phase: rnd() * 10,
+    sprite: sprites[Math.floor(rnd() * sprites.length)],
+  }));
 
-  /* ---------- Drawing ---------- */
-  const staticLayer = document.createElement('canvas');
-  let scale = 1;
-  function resize() {
-    // extra resolution, because the page starts zoomed in
-    const ratio = Math.min(3, (window.devicePixelRatio || 1) * 1.8);
-    const box = canvas.parentElement;   // offsetWidth ignores the zoom animation
-    canvas.width = staticLayer.width = Math.round(box.offsetWidth * ratio);
-    canvas.height = staticLayer.height = Math.round(box.offsetHeight * ratio);
-    scale = canvas.width / VB.w;
-    drawStatic();
-  }
-  function toCanvas(g) { g.setTransform(scale, 0, 0, scale, -VB.x * scale, -VB.y * scale); }
-  function drawStatic() {
-    const g = staticLayer.getContext('2d');
-    g.setTransform(1, 0, 0, 1, 0, 0);
-    g.clearRect(0, 0, staticLayer.width, staticLayer.height);
-    toCanvas(g);
-    const dark = document.documentElement.dataset.theme === 'dark';
-    g.strokeStyle = dark ? 'rgba(255,255,255,0.32)' : 'rgba(110,95,160,0.32)';
-    g.lineWidth = 0.6;
-    g.lineCap = 'round';
-    g.lineJoin = 'round';
-    g.beginPath();
-    for (const l of lines) {
-      g.moveTo(l.pts[0].x, l.pts[0].y);
-      for (let i = 1; i < l.pts.length; i++) g.lineTo(l.pts[i].x, l.pts[i].y);
+  function renderDots(dt, time) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // fade the previous frame a little: this leaves a trail behind each dot
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+    ctx.globalCompositeOperation = document.documentElement.dataset.theme === 'dark' ? 'lighter' : 'source-over';
+    for (const f of flyers) {
+      // they follow invisible, curving currents (like signals in the nerves)
+      const a = Math.sin(f.y * 0.004 + time * 0.25 + f.phase) + Math.cos(f.x * 0.003 - time * 0.2);
+      f.x += Math.cos(a * 1.6) * f.speed * dt;
+      f.y += Math.sin(a * 1.6) * f.speed * dt;
+      if (f.x < -20) f.x = innerWidth + 20; else if (f.x > innerWidth + 20) f.x = -20;
+      if (f.y < -20) f.y = innerHeight + 20; else if (f.y > innerHeight + 20) f.y = -20;
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(f.sprite, f.x - f.size / 2, f.y - f.size / 2, f.size, f.size);
     }
-    g.stroke();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
   }
 
-  let running = true, last = performance.now();
+  /* ---------- Timeline ---------- */
+  let start = performance.now(), last = start, lastAscii = 0, running = true, opening = false, titleShown = false;
   function frame(now) {
     if (!running) return;
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(staticLayer, 0, 0);
-    toCanvas(ctx);
-    ctx.globalCompositeOperation = document.documentElement.dataset.theme === 'dark' ? 'lighter' : 'source-over';
-    for (let i = 0; i < dots.length; i++) {
-      const d = dots[i];
-      d.s += d.speed * dt;
-      if (d.s > d.l.len) { dots[i] = newDot(false); continue; }
-      const fade = Math.min(1, d.s / 12, (d.l.len - d.s) / 12);
-      // small tail behind each dot
-      for (let k = 3; k >= 0; k--) {
-        const s = d.s - k * 3;
-        if (s < 0) continue;
-        const p = pointAt(d.l, d.back ? d.l.len - s : s);
-        const r = d.size * (1 - k * 0.2);
-        ctx.globalAlpha = fade * (1 - k * 0.24);
-        ctx.drawImage(d.sprite, p.x - r / 2, p.y - r / 2, r, r);
-      }
+    const t = (now - start) / 1000;
+    renderDots(dt, t);
+    if (!titleShown && now - lastAscii > 50) {          // the ASCII changes 20 times per second
+      renderAscii(t);
+      lastAscii = now;
     }
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = 'source-over';
+    if (!titleShown && t >= T.title) {
+      titleShown = true;
+      pre.classList.add('fade');
+      words.classList.add('show');
+    }
+    if (!opening && t >= T.open) open();
     requestAnimationFrame(frame);
   }
-
-  resize();
-  window.addEventListener('resize', resize);
-  new MutationObserver(drawStatic).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   requestAnimationFrame(frame);
 
-  /* ---------- Loading bar, then "Enter" ---------- */
-  const fill = document.getElementById('loaderFill'), pct = document.getElementById('loaderPct');
-  const loader = document.getElementById('loader'), enter = document.getElementById('enter');
-  const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-  let ready = false;
-  fontsReady.then(() => { ready = true; });
-  const start = performance.now();
-  (function progress(now) {
-    const k = Math.min(1, (now - start) / (LOAD_SECONDS * 1000));
-    const eased = 1 - Math.pow(1 - k, 2.2);
-    const shown = ready ? eased : Math.min(eased, 0.92);
-    fill.style.width = (shown * 100).toFixed(1) + '%';
-    pct.textContent = Math.round(shown * 100) + '%';
-    if (shown >= 1) {
-      loader.classList.add('done');
-      enter.hidden = false;
-      return;
-    }
-    requestAnimationFrame(progress);
-  })(start);
-
-  function leave() {
-    if (enter.hidden || intro.classList.contains('leaving')) return;
-    intro.classList.add('leaving');
+  function open() {
+    if (opening) return;
+    opening = true;
+    intro.classList.add('opening');
     document.body.classList.remove('intro-open');
-    setTimeout(() => {
-      running = false;
-      intro.hidden = true;
-      document.getElementById('situation').focus({ preventScroll: true });
-    }, 1500);
+    const t0 = performance.now(), DURATION = 1700;
+    (function grow(now) {
+      const k = Math.min(1, (now - t0) / DURATION);
+      const ease = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      intro.style.setProperty('--hole', (ease * 130).toFixed(2) + 'vmax');
+      if (k < 1) requestAnimationFrame(grow);
+      else {
+        running = false;
+        intro.hidden = true;
+        document.getElementById('situation').focus({ preventScroll: true });
+      }
+    })(t0);
   }
-  enter.addEventListener('click', leave);
+
+  document.getElementById('skip').addEventListener('click', open);
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !intro.hidden && document.body.classList.contains('intro-open')) leave();
+    if ((e.key === 'Enter' || e.key === 'Escape') && !opening) open();
   });
 })();
