@@ -481,14 +481,15 @@ body.intro-open .top-controls .pill { opacity: 0; pointer-events: none; }
 
 .intro-center {
   position: absolute; inset: 0;
-  display: flex; flex-direction: column;
+  display: flex; flex-direction: row;           /* title on the left, spinner on the right */
   align-items: center; justify-content: center;
-  gap: 28px;
+  gap: clamp(48px, 22vw, 420px);                /* the big space between them */
+  padding: 0 24px;
 }
 .intro-title {
   font-family: var(--title);
   font-weight: 400;
-  font-size: clamp(110px, 16vw, 220px);
+  font-size: clamp(84px, 16vw, 220px);
   line-height: 1;
   margin: 0;
   color: var(--text);
@@ -497,11 +498,17 @@ body.intro-open .top-controls .pill { opacity: 0; pointer-events: none; }
 @keyframes fadeIn { from { opacity: 0; filter: blur(8px); } to { opacity: 1; filter: none; } }
 
 /* tick spinner: the ticks turn one step at a time */
-.spinner { width: 56px; height: 56px; fill: var(--text); animation: fadeIn 1s .4s ease both; }
+.spinner { flex: none; width: 56px; height: 56px; fill: var(--text); animation: fadeIn 1s .4s ease both; }
 .spinner-turn { animation: tick 1.2s steps(24) infinite; }
 @keyframes tick { to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
   .intro-mist span { animation: none; }
   .spinner-turn { animation-duration: 3s; }
+}
+
+@media (max-width: 520px) {
+  .intro-center { gap: 40px; }
+  .intro-title { font-size: 64px; }
+  .spinner { width: 44px; height: 44px; }
 }
