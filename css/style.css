@@ -482,14 +482,13 @@ body.intro-open .top-controls .pill { opacity: 0; pointer-events: none; }
 .intro-center {
   position: absolute; inset: 0;
   display: flex; flex-direction: row;           /* title on the left, spinner on the right */
-  align-items: center; justify-content: center;
-  gap: clamp(48px, 22vw, 420px);                /* the big space between them */
-  padding: 0 24px;
+  align-items: center; justify-content: space-between;
+  padding: 0 8vw;                               /* distance from the edges of the screen */
 }
 .intro-title {
   font-family: var(--title);
   font-weight: 400;
-  font-size: clamp(84px, 16vw, 220px);
+  font-size: 64px;                             /* about the height of the spinner */
   line-height: 1;
   margin: 0;
   color: var(--text);
@@ -508,7 +507,5 @@ body.intro-open .top-controls .pill { opacity: 0; pointer-events: none; }
 }
 
 @media (max-width: 520px) {
-  .intro-center { gap: 40px; }
-  .intro-title { font-size: 64px; }
-  .spinner { width: 44px; height: 44px; }
+  .intro-center { padding: 0 24px; }
 }
