@@ -186,7 +186,11 @@ export default function FolderTabs(props) {
                 {page ? (
                     <motion.div
                         key={active}
-                        initial={{ opacity: transition ? 0 : 1 }}
+                        // Sur le canvas Framer les animations ne se lancent pas :
+                        // on part directement de l'état visible, sinon la page reste invisible.
+                        initial={
+                            transition && !isCanvas ? { opacity: 0 } : false
+                        }
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.25 }}
                         style={{ width: "100%", height: "100%" }}
