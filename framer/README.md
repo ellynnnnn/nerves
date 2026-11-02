@@ -12,7 +12,7 @@ Galerie de projets en cartes fines verticales. La carte au centre s'ouvre (image
 
 | Groupe | Ce qu'on règle |
 |---|---|
-| **Projets** (15 max) | titre, description, jusqu'à 4 tags, image, image de survol (facultative), couleur de fond, **lien vers une page**, nouvel onglet |
+| **Projets** (15 max) | titre, description, jusqu'à 4 tags, image, **vidéo** (mp4 / webm / mov), image ou **vidéo de survol** (facultatives), couleur de fond, **lien vers une page**, nouvel onglet |
 | **Filtres** (12 max) | un filtre par ligne. Un projet apparaît si l'un de ses tags porte **exactement** le nom du filtre (majuscules ignorées) |
 | **Label « All »** | texte du bouton « tout afficher » |
 | **Carte ouverte** | *Intégrée* (réglable dans le groupe « Carte ouverte ») ou *Mon composant* (voir plus bas) |
@@ -23,6 +23,13 @@ Galerie de projets en cartes fines verticales. La carte au centre s'ouvre (image
 | **Image au survol** | **largeur / hauteur**, arrondi, décalage, douceur du suivi, ombre |
 | **Barre de filtres** | afficher les filtres / la règle, alignement, typo, couleurs |
 | **Curseur** | main, pointeur, flèche, **rond avec texte** (« Drag » / « Voir »), **votre image**, ou masqué |
+
+## Vidéos
+
+- **Vidéo** : remplace l'image dans la carte ouverte. Elle tourne en boucle, sans le son. Si vous mettez aussi une image, elle s'affiche pendant le chargement.
+- **Vidéo survol** : s'affiche à la place de l'image de survol.
+- Ordre utilisé au survol : vidéo survol, image survol, image, puis vidéo.
+- Exportez des vidéos courtes et légères (mp4 H.264, moins de 5 Mo environ) pour que la page reste rapide.
 
 ## Utiliser votre propre template de carte ouverte (variants)
 

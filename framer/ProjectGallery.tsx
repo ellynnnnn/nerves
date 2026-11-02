@@ -23,6 +23,8 @@ interface Project {
     tags?: string[]
     image?: Img
     hoverImage?: Img
+    video?: string
+    hoverVideo?: string
     link?: string
     newTab?: boolean
     cardColor?: string
@@ -397,7 +399,15 @@ export default function ProjectGallery(props: Props) {
         hover.enabled && hovered !== null && hovered !== activeIndex && !dragging
             ? items[hovered]
             : null
-    const hoverSrc = hoverItem ? srcOf(hoverItem.hoverImage) || srcOf(hoverItem.image) : ""
+    // priorité : vidéo survol > image survol > image > vidéo principale
+    let hoverSrc = ""
+    let hoverIsVideo = false
+    if (hoverItem) {
+        if (hoverItem.hoverVideo) [hoverSrc, hoverIsVideo] = [hoverItem.hoverVideo, true]
+        else if (srcOf(hoverItem.hoverImage)) hoverSrc = srcOf(hoverItem.hoverImage)
+        else if (srcOf(hoverItem.image)) hoverSrc = srcOf(hoverItem.image)
+        else if (hoverItem.video) [hoverSrc, hoverIsVideo] = [hoverItem.video, true]
+    }
 
     /* --------- rendu --------- */
     return (
@@ -558,7 +568,24 @@ export default function ProjectGallery(props: Props) {
                                                 PLACEHOLDERS[p._idx % PLACEHOLDERS.length],
                                         }}
                                     >
-                                        {img && (
+                                        {p.video ? (
+                                            <video
+                                                src={p.video}
+                                                poster={img || undefined}
+                                                autoPlay
+                                                muted
+                                                loop
+                                                playsInline
+                                                preload="metadata"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                    pointerEvents: "none",
+                                                    display: "block",
+                                                }}
+                                            />
+                                        ) : img && (
                                             <img
                                                 src={img}
                                                 srcSet={srcSetOf(p.image)}
@@ -656,10 +683,8 @@ export default function ProjectGallery(props: Props) {
                         zIndex: 10,
                     }}
                 >
-                    <motion.img
+                    <motion.div
                         key={hoverItem._idx}
-                        src={hoverSrc}
-                        alt=""
                         initial={{ opacity: 0, scale: 0.92 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.18 }}
@@ -669,13 +694,30 @@ export default function ProjectGallery(props: Props) {
                             top: -hover.height / 2 + hover.offsetY,
                             width: hover.width,
                             height: hover.height,
-                            objectFit: "cover",
+                            overflow: "hidden",
                             borderRadius: hover.radius,
                             boxShadow: hover.shadow
                                 ? "0 12px 40px rgba(0,0,0,.25)"
                                 : "none",
                         }}
-                    />
+                    >
+                        {hoverIsVideo ? (
+                            <video
+                                src={hoverSrc}
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                            />
+                        ) : (
+                            <img
+                                src={hoverSrc}
+                                alt=""
+                                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                            />
+                        )}
+                    </motion.div>
                 </motion.div>
             )}
 
@@ -893,7 +935,17 @@ addPropertyControls(ProjectGallery, {
                     defaultValue: [],
                 },
                 image: { type: ControlType.ResponsiveImage, title: "Image" },
+                video: {
+                    type: ControlType.File,
+                    title: "Vidéo",
+                    allowedFileTypes: ["mp4", "webm", "mov"],
+                },
                 hoverImage: { type: ControlType.ResponsiveImage, title: "Image survol" },
+                hoverVideo: {
+                    type: ControlType.File,
+                    title: "Vidéo survol",
+                    allowedFileTypes: ["mp4", "webm", "mov"],
+                },
                 cardColor: { type: ControlType.Color, title: "Couleur fond", optional: true },
                 link: { type: ControlType.Link, title: "Lien" },
                 newTab: { type: ControlType.Boolean, title: "Nouvel onglet", defaultValue: false },
