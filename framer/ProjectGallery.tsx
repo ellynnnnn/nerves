@@ -124,6 +124,42 @@ const srcSetOf = (i: Img) => (i && typeof i !== "string" ? i.srcSet : undefined)
 
 const PLACEHOLDERS = ["#d9d4cc", "#c9d3d8", "#d8cfd9", "#d2d9c9", "#d9cbc4"]
 
+// Les images hébergées par Framer acceptent ?scale-down-to=… : on demande
+// une version juste assez grande (x2 pour les écrans Retina) au lieu de
+// l'original, souvent très lourd.
+function resized(url: string, displayPx: number) {
+    if (!/framerusercontent\.com/.test(url)) return url
+    const target = [512, 1024, 2048, 4096].find((s) => s >= displayPx * 2) || 4096
+    try {
+        const u = new URL(url)
+        u.searchParams.set("scale-down-to", String(target))
+        return u.toString()
+    } catch {
+        return url
+    }
+}
+
+function HoverVideo({ src, active }: { src: string; active: boolean }) {
+    const ref = useRef<HTMLVideoElement>(null)
+    useEffect(() => {
+        const v = ref.current
+        if (!v) return
+        if (active) v.play().catch(() => {})
+        else v.pause()
+    }, [active])
+    return (
+        <video
+            ref={ref}
+            src={src}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+    )
+}
+
 function goTo(link?: string, newTab?: boolean) {
     if (!link || typeof window === "undefined") return
     if (newTab) window.open(link, "_blank", "noopener")
@@ -350,6 +386,21 @@ export default function ProjectGallery(props: Props) {
         my.set(e.clientY - r.top)
     }
 
+    /* --------- médias de survol (calculés une fois, version allégée) --------- */
+    // priorité : vidéo survol > image survol > image > vidéo principale
+    const hoverPx = Math.max(hover.width, hover.height)
+    const hoverMedia = useMemo(
+        () =>
+            projects.map((p) => {
+                if (p.hoverVideo) return { src: p.hoverVideo, video: true }
+                const img = srcOf(p.hoverImage) || srcOf(p.image)
+                if (img) return { src: resized(img, hoverPx), video: false }
+                if (p.video) return { src: p.video, video: true }
+                return null
+            }),
+        [projects, hoverPx]
+    )
+
     /* --------- mise en page des cartes --------- */
     const fp = clamp(pos, 0, maxPos)
     const ts = items.map((_, i) => smooth(1 - Math.min(1, Math.abs(i - fp))))
@@ -399,15 +450,7 @@ export default function ProjectGallery(props: Props) {
         hover.enabled && hovered !== null && hovered !== activeIndex && !dragging
             ? items[hovered]
             : null
-    // priorité : vidéo survol > image survol > image > vidéo principale
-    let hoverSrc = ""
-    let hoverIsVideo = false
-    if (hoverItem) {
-        if (hoverItem.hoverVideo) [hoverSrc, hoverIsVideo] = [hoverItem.hoverVideo, true]
-        else if (srcOf(hoverItem.hoverImage)) hoverSrc = srcOf(hoverItem.hoverImage)
-        else if (srcOf(hoverItem.image)) hoverSrc = srcOf(hoverItem.image)
-        else if (hoverItem.video) [hoverSrc, hoverIsVideo] = [hoverItem.video, true]
-    }
+    const hoverIdx = hoverItem ? hoverItem._idx : -1
 
     /* --------- rendu --------- */
     return (
@@ -589,6 +632,7 @@ export default function ProjectGallery(props: Props) {
                                             <img
                                                 src={img}
                                                 srcSet={srcSetOf(p.image)}
+                                                sizes={`${ew}px`}
                                                 alt={p.title || ""}
                                                 draggable={false}
                                                 style={{
@@ -670,8 +714,10 @@ export default function ProjectGallery(props: Props) {
                 </motion.div>
             </div>
 
-            {/* ---------- Image au survol ---------- */}
-            {hoverItem && hoverSrc && (
+            {/* ---------- Image au survol ----------
+                Toutes les images de survol sont chargées dès l'affichage de la
+                page et restent montées (invisibles) : le survol est instantané. */}
+            {hover.enabled && (
                 <motion.div
                     style={{
                         position: "absolute",
@@ -683,41 +729,42 @@ export default function ProjectGallery(props: Props) {
                         zIndex: 10,
                     }}
                 >
-                    <motion.div
-                        key={hoverItem._idx}
-                        initial={{ opacity: 0, scale: 0.92 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.18 }}
-                        style={{
-                            position: "absolute",
-                            left: -hover.width / 2 + hover.offsetX,
-                            top: -hover.height / 2 + hover.offsetY,
-                            width: hover.width,
-                            height: hover.height,
-                            overflow: "hidden",
-                            borderRadius: hover.radius,
-                            boxShadow: hover.shadow
-                                ? "0 12px 40px rgba(0,0,0,.25)"
-                                : "none",
-                        }}
-                    >
-                        {hoverIsVideo ? (
-                            <video
-                                src={hoverSrc}
-                                autoPlay
-                                muted
-                                loop
-                                playsInline
-                                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                            />
-                        ) : (
-                            <img
-                                src={hoverSrc}
-                                alt=""
-                                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                            />
-                        )}
-                    </motion.div>
+                    {hoverMedia.map((m, idx) =>
+                        m ? (
+                            <motion.div
+                                key={idx}
+                                initial={false}
+                                animate={{
+                                    opacity: idx === hoverIdx ? 1 : 0,
+                                    scale: idx === hoverIdx ? 1 : 0.92,
+                                }}
+                                transition={{ duration: 0.18 }}
+                                style={{
+                                    position: "absolute",
+                                    left: -hover.width / 2 + hover.offsetX,
+                                    top: -hover.height / 2 + hover.offsetY,
+                                    width: hover.width,
+                                    height: hover.height,
+                                    overflow: "hidden",
+                                    borderRadius: hover.radius,
+                                    boxShadow: hover.shadow
+                                        ? "0 12px 40px rgba(0,0,0,.25)"
+                                        : "none",
+                                }}
+                            >
+                                {m.video ? (
+                                    <HoverVideo src={m.src} active={idx === hoverIdx} />
+                                ) : (
+                                    <img
+                                        src={m.src}
+                                        alt=""
+                                        decoding="async"
+                                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                                    />
+                                )}
+                            </motion.div>
+                        ) : null
+                    )}
                 </motion.div>
             )}
 
